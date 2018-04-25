@@ -1,7 +1,6 @@
 package l2.thrift.cache.implementations;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
@@ -15,18 +14,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 
-public class ThriftDefaultCache extends DefaultCache {
-	protected static final Logger LOGGER = Logger.getLogger(RedisThriftCache.class.getCanonicalName());
+public abstract class ThriftDefaultCache extends DefaultCache {
 
 	private ObjectMapper objectMapper;
 
 	public ThriftDefaultCache(CacheConfiguration cacheConfiguration) {
 		super(cacheConfiguration);
-		objectMapper=new ObjectMapper();
+		objectMapper = new ObjectMapper();
 		objectMapper.enableDefaultTyping(DefaultTyping.NON_FINAL);
-		objectMapper.setVisibility(PropertyAccessor.ALL,Visibility.NONE).setVisibility(PropertyAccessor.FIELD, Visibility.PUBLIC_ONLY).setVisibility(PropertyAccessor.GETTER, Visibility.PUBLIC_ONLY).setVisibility(PropertyAccessor.SETTER,Visibility.PUBLIC_ONLY);
+		objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE)
+				.setVisibility(PropertyAccessor.FIELD, Visibility.PUBLIC_ONLY)
+				.setVisibility(PropertyAccessor.GETTER, Visibility.PUBLIC_ONLY)
+				.setVisibility(PropertyAccessor.SETTER, Visibility.PUBLIC_ONLY);
 	}
-	
+
 	protected String serialize(Object obj) throws TException {
 		try {
 			return objectMapper.writeValueAsString(obj);
@@ -37,20 +38,22 @@ public class ThriftDefaultCache extends DefaultCache {
 
 	@SuppressWarnings("rawtypes")
 	protected TBase deSerializeTBase(String tbase) {
-		try {
-			return objectMapper.readValue(tbase, TBase.class);
-		} catch (IOException e) {
-			throw new RuntimeException(tbase);
-		}
+		return deSerialize(tbase, TBase.class);
 	}
 
-	protected TCacheKey deSerializeTCacheKey(String tCacheKey)  {
-		try {
-			return objectMapper.readValue(tCacheKey, TCacheKey.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	protected TCacheKey deSerializeTCacheKey(String tCacheKey) {
+		return deSerialize(tCacheKey, TCacheKey.class);
 	}
 
+	private <T> T deSerialize(String value, Class<T> tClass) {
+		if (value == null) {
+			return null;
+		}
+		try {
+			return objectMapper.readValue(value, tClass);
+		} catch (IOException e) {
+			throw new RuntimeException(value);
+		}
+	}
 
 }
