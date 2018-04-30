@@ -1,4 +1,4 @@
-package l2.thrift.cache.implementations.redis;
+package l2.thrift.cache.implementations.redis.client;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;

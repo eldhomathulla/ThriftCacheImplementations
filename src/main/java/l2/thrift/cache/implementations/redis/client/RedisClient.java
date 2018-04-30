@@ -1,9 +1,10 @@
-package l2.thrift.cache.implementations.redis;
+package l2.thrift.cache.implementations.redis.client;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import l2.thrift.cache.implementations.redis.RedisFunctionNotImplementedException;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
 
 public interface RedisClient {

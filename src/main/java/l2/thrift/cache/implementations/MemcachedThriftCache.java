@@ -10,11 +10,11 @@ import org.apache.thrift.cache.TCacheKey;
 
 import net.spy.memcached.MemcachedClient;
 
-public class MemcachedCache extends ThriftDefaultCache {
+public class MemcachedThriftCache extends ThriftDefaultCache {
 	private MemcachedClient memcachedClient;
 	private int exp = 5000;
 
-	public MemcachedCache(CacheConfiguration cacheConfiguration, MemcachedClient memcachedClient, int exp,
+	public MemcachedThriftCache(CacheConfiguration cacheConfiguration, MemcachedClient memcachedClient, int exp,
 			Object... ifaces) {
 		super(cacheConfiguration, ifaces);
 		this.memcachedClient = memcachedClient;

@@ -5,6 +5,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.cache.*;
 
 import l2.thrift.cache.implementations.ThriftDefaultCache;
+import l2.thrift.cache.implementations.redis.client.RedisClient;
 
 import java.util.HashMap;
 import java.util.List;

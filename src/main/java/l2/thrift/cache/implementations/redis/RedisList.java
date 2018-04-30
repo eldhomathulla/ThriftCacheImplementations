@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import l2.thrift.cache.implementations.redis.client.RedisClient;
 import redis.clients.jedis.BinaryClient;
 
 public class RedisList<E> implements List<E> {
