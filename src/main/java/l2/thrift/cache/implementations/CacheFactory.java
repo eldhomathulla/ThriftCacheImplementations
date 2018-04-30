@@ -35,9 +35,9 @@ public class CacheFactory {
 	public static final String CACHE_TYPE_REDIS_CLUSTER = "redis_cluster";
 	public static final String CACHE_TYPE_REDIS = "redis";
 
-	private static final String LOCK_TYPE = "lock.type";
 	private static final String CURATOR_LOCKS_PATH = "/curator/locks";
-
+	
+	public static final String LOCK_TYPE_KEY = "lock.type";
 	public static final String CACHE_TYPE_KEY = "cache.type";
 	public static final String MEMCACHED_EXPR_KEY = "memcached.expr";
 	public static final String MEMCACHED_INSTANCES_KEY = "memcached.instances";
@@ -61,7 +61,7 @@ public class CacheFactory {
 	}
 
 	private ThriftLockFactory createThriftLockFactory() {
-		String lockType = (String) cacheConfiguration.getConfiguration(LOCK_TYPE);
+		String lockType = (String) cacheConfiguration.getConfiguration(LOCK_TYPE_KEY);
 		lockType = lockType == null ? "" : lockType;
 		switch (lockType) {
 		case LOCK_TYPE_ZOOKEEPER:
@@ -78,13 +78,14 @@ public class CacheFactory {
 	}
 
 	public TCache createCache() {
+		ThriftLockFactory thriftLockFactory = createThriftLockFactory();
 		String cacheType = (String) cacheConfiguration.getConfiguration(CACHE_TYPE_KEY);
 		switch (cacheType) {
 		case CACHE_TYPE_REDIS:
 			JedisPool jedisPool = new JedisPool((String) cacheConfiguration.getConfiguration(REDIS_HOST_KEY),
 					Integer.parseInt((String) cacheConfiguration.getConfiguration(REDIS_PORT_KEY)));
-			return new RedisThriftCache(cacheConfiguration, new RedisPoolClientImpl(jedisPool),
-					createThriftLockFactory(), ifaces);
+			return new RedisThriftCache(cacheConfiguration, new RedisPoolClientImpl(jedisPool), thriftLockFactory,
+					ifaces);
 		case CACHE_TYPE_REDIS_CLUSTER:
 			Set<HostAndPort> hostAndPorts = Arrays
 					.stream(cacheConfiguration.getConfiguration(REDIS_CLUSTER_INSTANCES_KEY).toString().split(","))
@@ -93,8 +94,8 @@ public class CacheFactory {
 						return new HostAndPort(hostPort[0], Integer.parseInt(hostPort[1]));
 					}).collect(Collectors.toSet());
 			JedisCluster jedisCluster = new JedisCluster(hostAndPorts);
-			return new RedisThriftCache(cacheConfiguration, new RedisClientClusterImpl(jedisCluster),
-					createThriftLockFactory(), ifaces);
+			return new RedisThriftCache(cacheConfiguration, new RedisClientClusterImpl(jedisCluster), thriftLockFactory,
+					ifaces);
 		case CACHE_TYPE_REDIS_SENTINEL:
 			Set<String> sentinels = Arrays
 					.stream(cacheConfiguration.getConfiguration(REDIS_SENTINELS_KEY).toString().split(","))
