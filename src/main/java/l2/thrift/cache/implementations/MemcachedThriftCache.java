@@ -1,6 +1,7 @@
 package l2.thrift.cache.implementations;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
@@ -48,11 +49,33 @@ public class MemcachedThriftCache extends ThriftDefaultCache {
 	}
 
 	protected void writeToCache(TCacheKey key, TBase value) throws TException {
+		LOGGER.info("writing to cache : " + key);
 		memcachedClient.set(serialize(key), exp, serialize(value));
 	}
 
 	protected TBase readFromCache(TCacheKey key) throws TException {
-		return deSerializeTBase((String) memcachedClient.get(serialize(key)));
+		LOGGER.info("Reading from cache: " + key);
+		long before = System.currentTimeMillis();
+		try {
+			return deSerializeTBase((String) memcachedClient.get(serialize(key)));
+		} finally {
+			System.out.println("key: " + (System.currentTimeMillis() - before));
+		}
+	}
+
+	@Override
+	public void postProcess(TCacheKey tCacheKey, String iFaceClassName, String processFunctionClassName,
+			String argsClassName) throws TException {
+	}
+
+	@Override
+	public TBase read(TCacheKey key, Supplier<TBase> getResult) throws TException {
+		TBase result = readFromCache(key);
+		if (result == null) {
+			result = getResult.get();
+			write(key, result);
+		}
+		return result;
 	}
 
 }

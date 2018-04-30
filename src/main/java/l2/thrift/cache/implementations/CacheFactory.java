@@ -28,7 +28,7 @@ import redis.clients.jedis.JedisSentinelPool;
 public class CacheFactory {
 
 	public static final String LOCK_TYPE_ZOOKEEPER = "zookeeper";
-	
+
 	public static final String CACHE_TYPE_DISABLED = "disabled";
 	public static final String CACHE_TYPE_MEMCACHED = "memcached";
 	public static final String CACHE_TYPE_REDIS_SENTINEL = "redis_sentinel";
@@ -105,16 +105,16 @@ public class CacheFactory {
 					createThriftLockFactory(), ifaces);
 		case CACHE_TYPE_MEMCACHED:
 			List<InetSocketAddress> inetSocketAddresses = Arrays
-					.stream(cacheConfiguration.getConfiguration(MEMCACHED_INSTANCES_KEY).toString().split(";"))
+					.stream(cacheConfiguration.getConfiguration(MEMCACHED_INSTANCES_KEY).toString().split(","))
 					.map((String hostPortStr) -> {
-						String[] hostPort = hostPortStr.split(",");
+						String[] hostPort = hostPortStr.split(":");
 						return new InetSocketAddress(hostPort[0], Integer.parseInt(hostPort[1]));
 					}).collect(Collectors.toList());
 			try {
-				new MemcachedThriftCache(cacheConfiguration, new MemcachedClient(inetSocketAddresses),
+				return new MemcachedThriftCache(cacheConfiguration, new MemcachedClient(inetSocketAddresses),
 						Integer.parseInt((String) cacheConfiguration.getConfiguration(MEMCACHED_EXPR_KEY)), ifaces);
 			} catch (NumberFormatException | IOException e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
 		case CACHE_TYPE_DISABLED:
 			return null;
