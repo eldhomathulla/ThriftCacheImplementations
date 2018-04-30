@@ -5,3 +5,4 @@ This repository contains Cache implementaion for Apache Thrift Cache API that ca
 - Memcached
 - Redis
 - Redis Cluster
+- Redis Sentinel
