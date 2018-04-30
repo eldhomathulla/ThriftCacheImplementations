@@ -7,8 +7,10 @@ import org.apache.thrift.cache.*;
 import l2.thrift.cache.implementations.ThriftDefaultCache;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 public class RedisThriftCache extends ThriftDefaultCache {
 	private RedisClient redisClient;
@@ -16,6 +18,27 @@ public class RedisThriftCache extends ThriftDefaultCache {
 	public RedisThriftCache(CacheConfiguration cacheConfiguration, RedisClient redisClient) {
 		super(cacheConfiguration);
 		this.redisClient = redisClient;
+	}
+
+	public RedisThriftCache(CacheConfiguration cacheConfiguration, RedisClient redisClient, Object... ifaces) {
+		super(cacheConfiguration, ifaces);
+		this.redisClient = redisClient;
+	}
+
+	public RedisThriftCache(CacheConfiguration cacheConfiguration, RedisClient redisClient,
+			ThriftLockFactory thriftLockFactory,
+			Function<String, List<DependentFunctionActionHolder>> dependentFunctionActionHolderListSupplier,
+			Object... ifaces) {
+		super(cacheConfiguration, thriftLockFactory, dependentFunctionActionHolderListSupplier, ifaces);
+		this.redisClient = redisClient;
+	}
+
+	public RedisThriftCache(CacheConfiguration cacheConfiguration, RedisClient redisClient,
+			ThriftLockFactory thriftLockFactory, Object... ifaces) {
+		this(cacheConfiguration, redisClient, thriftLockFactory,
+				(String name) -> new RedisList<DependentFunctionActionHolder>(name, redisClient,
+						DependentFunctionActionHolder.class),
+				ifaces);
 	}
 
 	@Override

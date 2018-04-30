@@ -14,8 +14,9 @@ public class MemcachedCache extends ThriftDefaultCache {
 	private MemcachedClient memcachedClient;
 	private int exp = 5000;
 
-	public MemcachedCache(CacheConfiguration cacheConfiguration, MemcachedClient memcachedClient, int exp) {
-		super(cacheConfiguration);
+	public MemcachedCache(CacheConfiguration cacheConfiguration, MemcachedClient memcachedClient, int exp,
+			Object... ifaces) {
+		super(cacheConfiguration, ifaces);
 		this.memcachedClient = memcachedClient;
 		this.exp = exp;
 	}
